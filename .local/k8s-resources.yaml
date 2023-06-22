@@ -1,0 +1,77 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: project-operator-webhook
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 443
+    targetPort: 2443
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: project-operator-webhook
+  namespace: default
+subsets:
+- addresses:
+  - ip: ${HOST_IP}
+  ports:
+  - port: 2443
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: project-operator-webhook
+  namespace: default
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: project-operator-webhook
+  namespace: default
+spec:
+  secretName: project-operator-webhook
+  dnsNames:
+  - project-operator-webhook.default
+  - project-operator-webhook.default.svc
+  - project-operator-webhook.default.svc.cluster.local
+  issuerRef:
+    kind: Issuer
+    name: project-operator-webhook
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: project-operator-webhook
+  annotations:
+    cert-manager.io/inject-ca-from: default/project-operator-webhook
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: project-operator-webhook
+      namespace: default
+      path: /validate-core-cs-sap-com-v1alpha1-project
+      port: 443
+  failurePolicy: Fail
+  name: vproject.kb.io
+  rules:
+  - apiGroups:
+    - core.cs.sap.com
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    - DELETE
+    resources:
+    - projects
+  sideEffects: None
+  timeoutSeconds: 10

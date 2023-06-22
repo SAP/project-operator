@@ -1,32 +1,82 @@
-# SAP Repository Template
-
-Default templates for SAP open source repositories, including LICENSE, .reuse/dep5, Code of Conduct, etc... All repositories on github.com/SAP will be created based on this template.
-
-## To-Do
-
-In case you are the maintainer of a new SAP open source project, these are the steps to do with the template files:
-
-- Check if the default license (Apache 2.0) also applies to your project. A license change should only be required in exceptional cases. If this is the case, please change the [license file](LICENSE).
-- Enter the correct metadata for the REUSE tool. See our [wiki page](https://wiki.wdf.sap.corp/wiki/display/ospodocs/Using+the+Reuse+Tool+of+FSFE+for+Copyright+and+License+Information) for details how to do it. You can find an initial .reuse/dep5 file to build on. Please replace the parts inside the single angle quotation marks < > by the specific information for your repository and be sure to run the REUSE tool to validate that the metadata is correct.
-- Adjust the contribution guidelines (e.g. add coding style guidelines, pull request checklists, different license if needed etc.)
-- Add information about your project to this README (name, description, requirements etc). Especially take care for the <your-project> placeholders - those ones need to be replaced with your project name. See the sections below the horizontal line and [our guidelines on our wiki page](https://wiki.wdf.sap.corp/wiki/display/ospodocs/Guidelines+for+README.md+file) what is required and recommended.
-- Remove all content in this README above and including the horizontal line ;)
-
-***
-
 # Our new open source project
+
+[![REUSE status](https://api.reuse.software/badge/github.com/SAP/project-operator)](https://api.reuse.software/info/github.com/SAP/project-operator)
 
 ## About this project
 
-*Insert a short description of your project here...*
+This repository adds a custom resource type `projects.core.cs.sap.com` to Kubernetes clusters, which could be instantiated like this:
+
+```yaml
+apiVersion: core.cs.sap.com/v1alpha1
+kind: Project
+metadata:
+  name: awesome-stuff
+spec:
+  labels:
+    properties.domain.com/awesome: "true"
+  annotations:
+    properties.domain.com/cool: "forsure"
+  adminUsers:
+  - someoneimportant@domain.com
+  - masterbrain@otherdomain.com
+  adminGroups:
+  - peoplewhoknowwhattheyaredoing
+  viewerUsers:
+  - somebodyelse@domain.com
+  viewerGroups:
+  - normalpeople
+  ```
+
+When reconciling such resources, the operator contained in this repository creates a namespace named like the project,  prefixed by `project-`, such as `project-awesome-stuff` in the above example, and maintains role bindings in that namespace, granting admin/view permissions to
+the identities defined in the project's spec. By default the admin rolebinding will reference the built-in `cluster-admin` cluster role, and the viewer rolebinding will reference the built-in `view` cluster role,
+but this can be overridden by the following command line flags:
+
+```bash
+  -admin-cluster-role string
+      Cluster role that admin users/groups will be granted on project namespace level.
+      (default "cluster-admin")
+  -viewer-cluster-role string
+      Cluster role that viewer users/groups will be granted on project namespace level.
+      (default "view")
+```
+
+In addition, the operator can be instructed to grant cluster view permissions (i.e. create a cluster role binding to the `view` cluster role) to all identities occurring in the project's spec:
+
+```bash
+  -enable-cluster-view
+      Automatically grant cluster view authorizations to all referenced users/groups.
+```
+The prefix used to construct the namespace name from the project name (default: `project-`) can be
+overridden by command line flag:
+
+```bash
+  -namespace-prefix string
+      Prefix of generated namespaces. (default "project-")
+```
+
+Note that setting this prefix to the empty string is forbidden due to security reasons.
+
+When updating or deleting a project resource, the operator applies additional authorization logic
+(besides the normal RBAC logic):
+- no additional authorization checks are enforced for service accounts
+- no additional authorization checks are enforced for users/groups listed in `spec.adminUsers` or `spec.adminGroups`
+- other users will be denied unless they have the authorization to perform the analogous operation (update or delete) on the namespace managed by the project.
 
 ## Requirements and Setup
 
-*Insert a short description what is required to get your project running...*
+The recommended deployment method is to use the [Helm chart](https://github.com/sap/project-operator-helm):
+
+```bash
+helm upgrade -i project-operator oci://ghcr.io/sap/project-operator-helm/project-operator
+```
+
+## Documentation
+ 
+The API reference is here: [https://pkg.go.dev/github.com/sap/project-operator](https://pkg.go.dev/github.com/sap/project-operator).
 
 ## Support, Feedback, Contributing
 
-This project is open to feature requests/suggestions, bug reports etc. via [GitHub issues](https://github.com/SAP/<your-project>/issues). Contribution and feedback are encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](CONTRIBUTING.md).
+This project is open to feature requests/suggestions, bug reports etc. via [GitHub issues](https://github.com/SAP/project-operator/issues). Contribution and feedback are encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](CONTRIBUTING.md).
 
 ## Code of Conduct
 
@@ -34,4 +84,4 @@ We as members, contributors, and leaders pledge to make participation in our com
 
 ## Licensing
 
-Copyright (20xx-)20xx SAP SE or an SAP affiliate company and <your-project> contributors. Please see our [LICENSE](LICENSE) for copyright and license information. Detailed information including third-party components and their licensing/copyright information is available [via the REUSE tool](https://api.reuse.software/info/github.com/SAP/<your-project>).
+Copyright 2023 SAP SE or an SAP affiliate company and project-operator contributors. Please see our [LICENSE](LICENSE) for copyright and license information. Detailed information including third-party components and their licensing/copyright information is available [via the REUSE tool](https://api.reuse.software/info/github.com/SAP/project-operator).

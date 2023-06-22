@@ -1,0 +1,12 @@
+apiVersion: core.cs.sap.com/v1alpha1
+kind: Project
+metadata:
+  labels:
+    app.kubernetes.io/name: project
+    app.kubernetes.io/instance: project-sample
+    app.kubernetes.io/part-of: project-operator
+    app.kuberentes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: project-operator
+  name: project-sample
+spec:
+  # TODO(user): Add fields here
