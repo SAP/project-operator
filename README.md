@@ -1,4 +1,4 @@
-# Our new open source project
+# Manage Custom Namespaces in Kubernetes
 
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP/project-operator)](https://api.reuse.software/info/github.com/SAP/project-operator)
 
