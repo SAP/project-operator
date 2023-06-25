@@ -4,7 +4,9 @@
 
 ## About this project
 
-This repository adds a custom resource type `projects.core.cs.sap.com` to Kubernetes clusters, which could be instantiated like this:
+The goal of this project is to enable individuals, teams, or pipelines, to setup (certain) Kubernetes namespaces including RBAC configuration, without
+having or needing authorization to manage the underlying namespace or RBAC entities directly.
+This is achieved by adding a custom resource type `projects.core.cs.sap.com` to Kubernetes clusters, which could be instantiated like this:
 
 ```yaml
 apiVersion: core.cs.sap.com/v1alpha1
@@ -27,6 +29,7 @@ spec:
   - normalpeople
   ```
 
+The idea is now to authorize users (such as teams or pipelines) to manage these `Project` resources, instead of giving them rights on namespaces or RBAC entities.
 When reconciling such resources, the operator contained in this repository creates a namespace named like the project,  prefixed by `project-`, such as `project-awesome-stuff` in the above example, and maintains role bindings in that namespace, granting admin/view permissions to
 the identities defined in the project's spec. By default the admin rolebinding will reference the built-in `cluster-admin` cluster role, and the viewer rolebinding will reference the built-in `view` cluster role,
 but this can be overridden by the following command line flags:
