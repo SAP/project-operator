@@ -40,7 +40,7 @@ jobs:
       run: |
         this_year=$(date +%Y)
         last_year=$((this_year-1))
-        repository=${{ github.repository }}
+        repository=$(echo ${{ github.repository }} | cut -d/ -f2)
         boilerplate=hack/boilerplate.go.txt
 
         tempdir=$(mktemp -d)
