@@ -6,6 +6,10 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  CHART_REPOSITORY: ${{ github.repository }}-helm
+  CHART_DIRECTORY: chart
+  WORKFLOW_USER_NAME: ERP4SME-DevOps-GitHub-Workflow-User
+  WORKFLOW_USER_EMAIL: 134080766+ERP4SME-DevOps-GitHub-Workflow-User@users.noreply.github.com
 
 defaults:
   run:
@@ -36,3 +40,53 @@ jobs:
         cd crds
         repository=${{ github.repository }}/crds
         tar cvz * | $RUNNER_TEMP/regctl artifact put -m application/gzip $REGISTRY/${repository,,}:${{ github.event.release.tag_name }}
+
+  update-chart:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Checkout chart repository
+      uses: actions/checkout@v3
+      with:
+        repository: ${{ env.CHART_REPOSITORY }}
+        path: chart-repository
+        token: ${{ secrets.WORKFLOW_USER_GH_TOKEN }}
+
+    - name: Update chart repository
+      run: |
+        cd chart-repository
+        old_version=$(yq .appVersion ${{ env.CHART_DIRECTORY }}/Chart.yaml)
+        old_semver=${old_version#v}
+        new_version=${{ github.event.release.tag_name }}
+        new_semver=${new_version#v}
+
+        higher_semver=$(echo -e "$old_semver\n$new_semver" | sort -r -n -t. -k1 -k2 -k3 | head -n1)
+        if [ "$higher_semver" != "$new_semver" ]; then
+          echo "Target appVersion ($new_version) is lower than current appVersion ($old_version); skipping update."
+          exit 0
+        fi
+
+        echo "Updating custom resource definitions (${{ env.CHART_DIRECTORY }}/crds) ..."
+        rm -rf ${{ env.CHART_DIRECTORY }}/crds
+        cp -r ../crds ${{ env.CHART_DIRECTORY }}
+
+        echo "Updating appVersion in ${{ env.CHART_DIRECTORY }}/Chart.yaml (current: $old_version; target: $new_version) ..."
+        perl -pi -e "s#^appVersion:.*#appVersion: $new_version#g" ${{ env.CHART_DIRECTORY }}/Chart.yaml
+        if [ -z "$(git status --porcelain)" ]; then
+          echo "Nothing has changed; skipping update."
+          exit 0
+        fi
+
+        git config user.name "${{ env.WORKFLOW_USER_NAME }}"
+        git config user.email "${{ env.WORKFLOW_USER_EMAIL }}"
+        git add -A
+        git commit -F- <<END
+        Update chart (triggered by operator release $new_version)
+        Repository: ${{ github.repository }}
+        Release: ${{ github.event.release.tag_name }}
+        Commit: ${{ github.sha }}"
+        END
+        git push
