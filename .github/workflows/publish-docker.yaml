@@ -36,6 +36,40 @@ jobs:
       with:
         go-version-file: 'go.mod'
 
+    - name: Check that license header boilerplate is correct
+      run: |
+        this_year=$(date +%Y)
+        last_year=$((this_year-1))
+        repository=${{ github.repository }}
+        boilerplate=hack/boilerplate.go.txt
+
+        tempdir=$(mktemp -d)
+        trap 'rm -rf $tempdir' EXIT
+
+        cat > $tempdir/boilerplate-this-year <<END
+        /*
+        SPDX-FileCopyrightText: $this_year SAP SE or an SAP affiliate company and $repository contributors
+        SPDX-License-Identifier: Apache-2.0
+        */
+        END
+        cat > $tempdir/boilerplate-last-year <<END
+        /*
+        SPDX-FileCopyrightText: $last_year SAP SE or an SAP affiliate company and $repository contributors
+        SPDX-License-Identifier: Apache-2.0
+        */
+        END
+
+        if diff -q $boilerplate $tempdir/boilerplate-this-year >/dev/null; then
+          exit 0
+        fi
+        if diff -q $boilerplate $tempdir/boilerplate-last-year >/dev/null; then
+          >&1 echo "WARNING: license boilerplate outdated ($last_year); next year, this will result in an error."
+          exit 0
+        fi
+        >&1 echo "ERROR: incorrect license boilerplate"
+        exit 1
+        END
+
     - name: Check that generated artifacts are up-to-date
       run: |
         make generate
