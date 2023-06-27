@@ -89,6 +89,6 @@ jobs:
         Update chart (triggered by operator release $new_version)
         Repository: ${{ github.repository }}
         Release: ${{ github.event.release.tag_name }}
-        Commit: ${{ github.sha }}"
+        Commit: ${{ github.sha }}
         END
         git push
