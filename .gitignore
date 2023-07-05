@@ -26,6 +26,9 @@ Dockerfile.cross
 *.swo
 *~
 
+# vscode stuff
+.vscode/*.log
+
 # temp stuff
 /tmp
 

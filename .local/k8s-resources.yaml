@@ -5,10 +5,9 @@ metadata:
   name: project-operator-webhook
   namespace: default
 spec:
-  type: ClusterIP
   ports:
-  - protocol: TCP
-    port: 443
+  - port: 443
+    protocol: TCP
     targetPort: 2443
 ---
 apiVersion: v1
@@ -36,14 +35,14 @@ metadata:
   name: project-operator-webhook
   namespace: default
 spec:
-  secretName: project-operator-webhook
   dnsNames:
+  - project-operator-webhook
   - project-operator-webhook.default
   - project-operator-webhook.default.svc
   - project-operator-webhook.default.svc.cluster.local
   issuerRef:
-    kind: Issuer
     name: project-operator-webhook
+  secretName: project-operator-webhook
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
@@ -60,8 +59,7 @@ webhooks:
       namespace: default
       path: /validate-core-cs-sap-com-v1alpha1-project
       port: 443
-  failurePolicy: Fail
-  name: vproject.kb.io
+  name: validate.projects.core.cs.sap.com
   rules:
   - apiGroups:
     - core.cs.sap.com
@@ -73,5 +71,8 @@ webhooks:
     - DELETE
     resources:
     - projects
+    scope: Cluster
+  matchPolicy: Equivalent
   sideEffects: None
   timeoutSeconds: 10
+  failurePolicy: Fail
