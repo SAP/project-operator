@@ -30,7 +30,7 @@ import (
 // log is for logging in this package.
 var projectlog = logf.Log.WithName("project-resource")
 
-//+kubebuilder:webhook:path=/validate-core-cs-sap-com-v1alpha1-project,mutating=false,failurePolicy=fail,sideEffects=None,groups=core.cs.sap.com,resources=projects,verbs=create;update;delete,versions=v1alpha1,name=vproject.kb.io,admissionReviewVersions=v1
+// +kubebuilder:webhook:path=/validate-core-cs-sap-com-v1alpha1-project,mutating=false,failurePolicy=fail,sideEffects=None,groups=core.cs.sap.com,resources=projects,verbs=create;update;delete,versions=v1alpha1,name=vproject.kb.io,admissionReviewVersions=v1
 
 // ProjectWebhookOptions defines options for a ProjectWebhook
 type ProjectReconcilerOptions struct {

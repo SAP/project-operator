@@ -16,6 +16,7 @@ COPY main.go main.go
 COPY api/ api/
 COPY controllers/ controllers/
 COPY webhooks/ webhooks/
+COPY pkg/ pkg/
 COPY internal/ internal/
 COPY crds/ crds/
 COPY Makefile Makefile

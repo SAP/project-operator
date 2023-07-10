@@ -44,16 +44,16 @@ type Condition struct {
 	// Condition type (such as 'Ready', ...)
 	Type ConditionType `json:"type"`
 	// Condition status (one of True, False, Unknown)
-	//+kubebuilder:validation:Enum=True;False;Unknown
+	// +kubebuilder:validation:Enum=True;False;Unknown
 	Status ConditionStatus `json:"status"`
 	// Timestamp of the last change of ConditionStatus
-	//+optional
+	// +optional
 	LastTransitionTime *metav1.Time `json:"lastTransitionTime,omitempty"`
 	// Reason is a programmatically usable identifier explaining the current ConditionStatus.
-	//+optional
+	// +optional
 	Reason string `json:"reason,omitempty"`
 	// Message is a human readable explanation of the current ConditionStatus.
-	//+optional
+	// +optional
 	Message string `json:"message,omitempty"`
 }
 
@@ -93,11 +93,12 @@ const (
 	StateDeleting State = "Deleting"
 )
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-//+kubebuilder:resource:scope=Cluster
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:resource:scope=Cluster
 // +kubebuilder:printcolumn:name="State",type=string,JSONPath=`.status.state`
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
+// +genclient
 
 // Project is the Schema for the projects API.
 type Project struct {
@@ -109,7 +110,7 @@ type Project struct {
 	Status ProjectStatus `json:"status,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 
 // ProjectList contains a list of Project.
 type ProjectList struct {

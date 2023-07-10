@@ -66,9 +66,9 @@ func NewProjectReconciler(client client.Client, scheme *runtime.Scheme, options 
 	}
 }
 
-//+kubebuilder:rbac:groups=core.cs.sap.com,resources=projects,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=core.cs.sap.com,resources=projects/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=core.cs.sap.com,resources=projects/finalizers,verbs=update
+// +kubebuilder:rbac:groups=core.cs.sap.com,resources=projects,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=core.cs.sap.com,resources=projects/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=core.cs.sap.com,resources=projects/finalizers,verbs=update
 
 func (r *ProjectReconciler) Reconcile(ctx context.Context, req ctrl.Request) (result ctrl.Result, err error) {
 	log := log.FromContext(ctx)

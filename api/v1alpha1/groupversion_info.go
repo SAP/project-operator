@@ -24,3 +24,13 @@ var (
 	// AddToScheme adds the types in this group-version to the given scheme.
 	AddToScheme = SchemeBuilder.AddToScheme
 )
+
+var (
+	// Needed by kubernetes/code-generator
+	SchemeGroupVersion = GroupVersion
+)
+
+// Needed by kubernetes/code-generator
+func Resource(resource string) schema.GroupResource {
+	return GroupVersion.WithResource(resource).GroupResource()
+}
