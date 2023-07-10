@@ -163,28 +163,14 @@ $(ENVTEST): $(LOCALBIN)
 .PHONY: client-gen
 client-gen: $(CLIENT_GEN) ## Download client-gen
 $(CLIENT_GEN): $(LOCALBIN)
-	$(call go-install-tool,$(CLIENT_GEN),k8s.io/code-generator/cmd/client-gen@$(CODE_GENERATOR_VERSION))
+	test -s $(LOCALBIN)/client-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/client-gen@$(CODE_GENERATOR_VERSION)
 
 .PHONY: informer-gen
 informer-gen: $(INFORMER_GEN) ## Download informer-gen
 $(INFORMER_GEN): $(LOCALBIN)
-	$(call go-install-tool,$(INFORMER_GEN),k8s.io/code-generator/cmd/informer-gen@$(CODE_GENERATOR_VERSION))
+	test -s $(LOCALBIN)/informer-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/informer-gen@$(CODE_GENERATOR_VERSION)
 
 .PHONY: lister-gen
 lister-gen: $(LISTER_GEN) ## Download lister-gen
 $(LISTER_GEN): $(LOCALBIN)
-	$(call go-install-tool,$(LISTER_GEN),k8s.io/code-generator/cmd/lister-gen@$(CODE_GENERATOR_VERSION))
-
-# go-install-tool will 'go install' any package $2 and install it to $1.
-PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
-define go-install-tool
-@[ -f $(1) ] || { \
-set -e ;\
-TMP_DIR=$$(mktemp -d) ;\
-cd $$TMP_DIR ;\
-go mod init tmp ;\
-echo "Downloading $(2)" ;\
-GOBIN=$(PROJECT_DIR)/bin go install $(2) ;\
-rm -rf $$TMP_DIR ;\
-}
-endef
+	test -s $(LOCALBIN)/lister-gen || GOBIN=$(LOCALBIN) go install k8s.io/code-generator/cmd/lister-gen@$(CODE_GENERATOR_VERSION)
