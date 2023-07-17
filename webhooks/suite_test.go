@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -65,6 +66,7 @@ var group1Cli client.Client
 var group2Cli client.Client
 var ctx context.Context
 var cancel context.CancelFunc
+var threads sync.WaitGroup
 var tmpdir string
 
 var _ = BeforeSuite(func() {
@@ -126,7 +128,9 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 
 	By("starting manager")
+	threads.Add(1)
 	go func() {
+		threads.Done()
 		defer GinkgoRecover()
 		err := mgr.Start(ctx)
 		Expect(err).NotTo(HaveOccurred())
@@ -305,6 +309,7 @@ var _ = BeforeSuite(func() {
 var _ = AfterSuite(func() {
 	By("tearing down the test environment")
 	cancel()
+	threads.Wait()
 	err := testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())
 	err = os.RemoveAll(tmpdir)

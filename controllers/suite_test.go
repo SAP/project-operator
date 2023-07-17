@@ -11,6 +11,7 @@ import (
 	"math/rand"
 	"os"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -58,6 +59,7 @@ var cfg *rest.Config
 var cli client.Client
 var ctx context.Context
 var cancel context.CancelFunc
+var threads sync.WaitGroup
 var tmpdir string
 
 var _ = BeforeSuite(func() {
@@ -128,7 +130,9 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 
 	By("starting dummy controller-manager")
+	threads.Add(1)
 	go func() {
+		defer threads.Done()
 		defer GinkgoRecover()
 		// since there is no controller-manager in envtest, we have to remove the 'kubernetes' finalizer from namespaces when being deleted
 		for {
@@ -152,7 +156,9 @@ var _ = BeforeSuite(func() {
 	}()
 
 	By("starting manager")
+	threads.Add(1)
 	go func() {
+		defer threads.Done()
 		defer GinkgoRecover()
 		err := mgr.Start(ctx)
 		Expect(err).NotTo(HaveOccurred())
@@ -165,6 +171,7 @@ var _ = BeforeSuite(func() {
 var _ = AfterSuite(func() {
 	By("tearing down the test environment")
 	cancel()
+	threads.Wait()
 	err := testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())
 	err = os.RemoveAll(tmpdir)
