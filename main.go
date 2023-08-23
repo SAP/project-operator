@@ -22,6 +22,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	corev1alpha1 "github.com/sap/project-operator/api/v1alpha1"
 	"github.com/sap/project-operator/controllers"
@@ -86,23 +88,31 @@ func main() {
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
-	host, port, err := parseAddress(webhookAddr)
+	webhookHost, webhookPort, err := parseAddress(webhookAddr)
 	if err != nil {
 		setupLog.Error(err, "unable to parse webhook bind address")
 		os.Exit(1)
 	}
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:                        scheme,
-		MetricsBindAddress:            metricsAddr,
-		HealthProbeBindAddress:        probeAddr,
-		Host:                          host,
-		Port:                          port,
-		CertDir:                       webhookCertDir,
+		Scheme: scheme,
+		Client: client.Options{
+			Cache: &client.CacheOptions{
+				DisableFor: []client.Object{&corev1alpha1.Project{}},
+			},
+		},
 		LeaderElection:                enableLeaderElection,
 		LeaderElectionID:              LeaderElectionID,
 		LeaderElectionReleaseOnCancel: true,
-		ClientDisableCacheFor:         []client.Object{&corev1alpha1.Project{}},
+		WebhookServer: webhook.NewServer(webhook.Options{
+			Host:    webhookHost,
+			Port:    webhookPort,
+			CertDir: webhookCertDir,
+		}),
+		Metrics: metricsserver.Options{
+			BindAddress: metricsAddr,
+		},
+		HealthProbeBindAddress: probeAddr,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
