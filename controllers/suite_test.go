@@ -141,12 +141,12 @@ var _ = BeforeSuite(func() {
 				return
 			case <-time.After(100 * time.Millisecond):
 				namespaceList := &corev1.NamespaceList{}
-				err := cli.List(ctx, namespaceList)
+				err := cli.List(context.Background(), namespaceList)
 				Expect(err).NotTo(HaveOccurred())
 				for _, namespace := range namespaceList.Items {
 					if !namespace.DeletionTimestamp.IsZero() && slices.Contains(namespace.Spec.Finalizers, "kubernetes") {
 						namespace.Spec.Finalizers = slices.Remove(namespace.Spec.Finalizers, "kubernetes")
-						err := cli.SubResource("finalize").Update(ctx, &namespace)
+						err := cli.SubResource("finalize").Update(context.Background(), &namespace)
 						Expect(err).NotTo(HaveOccurred())
 					}
 					Expect(err).NotTo(HaveOccurred())
