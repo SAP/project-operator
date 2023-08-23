@@ -33,6 +33,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	corev1alpha1 "github.com/sap/project-operator/api/v1alpha1"
 	"github.com/sap/project-operator/webhooks"
@@ -110,13 +112,22 @@ var _ = BeforeSuite(func() {
 
 	By("creating manager")
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
-		Scheme:                 scheme,
-		MetricsBindAddress:     "0",
+		Scheme: scheme,
+		Client: client.Options{
+			Cache: &client.CacheOptions{
+				DisableFor: []client.Object{&corev1alpha1.Project{}},
+			},
+		},
+		WebhookServer: webhook.NewServer(webhook.Options{
+			Host:    webhookInstallOptions.LocalServingHost,
+			Port:    webhookInstallOptions.LocalServingPort,
+			CertDir: webhookInstallOptions.LocalServingCertDir,
+		}),
+		Metrics: metricsserver.Options{
+			BindAddress: "0",
+		},
 		HealthProbeBindAddress: "0",
-		Host:                   webhookInstallOptions.LocalServingHost,
-		Port:                   webhookInstallOptions.LocalServingPort,
-		CertDir:                webhookInstallOptions.LocalServingCertDir,
-		ClientDisableCacheFor:  []client.Object{&corev1alpha1.Project{}}})
+	})
 	Expect(err).NotTo(HaveOccurred())
 
 	err = webhooks.NewProjectWebhook(
@@ -405,6 +416,7 @@ var _ = Describe("Additional authorization checks when updating/deleting project
 })
 
 func validateClient(cli client.Client, accpetedObjects []client.ObjectList, rejectedObjects []client.ObjectList) {
+	// TODO: if this is called too fast after setting up rbac objects, things may fail (probably, because kubernetes needs a little while until rbac changes are effective ..)
 	for _, objectList := range accpetedObjects {
 		err := cli.List(ctx, objectList)
 		Expect(err).NotTo(HaveOccurred())
