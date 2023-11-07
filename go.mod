@@ -1,6 +1,6 @@
 module github.com/sap/project-operator
 
-go 1.21.3
+go 1.21.4
 
 require (
 	github.com/onsi/ginkgo/v2 v2.13.0
