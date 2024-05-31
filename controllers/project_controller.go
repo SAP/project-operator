@@ -116,10 +116,12 @@ func (r *ProjectReconciler) Reconcile(ctx context.Context, req ctrl.Request) (re
 				metrics.ProjectTTLSecondsRemaining.WithLabelValues(project.Name).Set(0)
 				metrics.ProjectExpired.WithLabelValues(project.Name).Set(0)
 			}
+			metrics.ProjectCreationTime.WithLabelValues(project.Name).Set(float64(project.CreationTimestamp.Unix()))
 		} else {
 			metrics.ProjectReconcileErrors.DeleteLabelValues(project.Name)
 			metrics.ProjectTTLSecondsInitial.DeleteLabelValues(project.Name)
 			metrics.ProjectTTLSecondsRemaining.DeleteLabelValues(project.Name)
+			metrics.ProjectCreationTime.DeleteLabelValues(project.Name)
 			metrics.ProjectExpired.DeleteLabelValues(project.Name)
 		}
 		if skipStatusUpdate {

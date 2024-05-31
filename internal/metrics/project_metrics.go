@@ -33,6 +33,13 @@ var (
 		},
 		[]string{"project"},
 	)
+	ProjectCreationTime = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "project_creation_time",
+			Help: "Creation time of the project in epoch seconds. Zero means that the project has not been created yet.",
+		},
+		[]string{"project"},
+	)
 	ProjectExpired = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "project_expired",
@@ -47,6 +54,7 @@ func init() {
 		ProjectReconcileErrors,
 		ProjectTTLSecondsInitial,
 		ProjectTTLSecondsRemaining,
+		ProjectCreationTime,
 		ProjectExpired,
 	)
 }
