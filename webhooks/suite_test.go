@@ -141,7 +141,7 @@ var _ = BeforeSuite(func() {
 	By("starting manager")
 	threads.Add(1)
 	go func() {
-		threads.Done()
+		defer threads.Done()
 		defer GinkgoRecover()
 		err := mgr.Start(ctx)
 		Expect(err).NotTo(HaveOccurred())
