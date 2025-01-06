@@ -1,5 +1,5 @@
 /*
-SPDX-FileCopyrightText: 2024 SAP SE or an SAP affiliate company and project-operator contributors
+SPDX-FileCopyrightText: 2025 SAP SE or an SAP affiliate company and project-operator contributors
 SPDX-License-Identifier: Apache-2.0
 */
 
@@ -18,7 +18,7 @@ type FakeCoreV1alpha1 struct {
 }
 
 func (c *FakeCoreV1alpha1) Projects(namespace string) v1alpha1.ProjectInterface {
-	return &FakeProjects{c, namespace}
+	return newFakeProjects(c, namespace)
 }
 
 // RESTClient returns a RESTClient that is used to communicate

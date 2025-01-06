@@ -1,5 +1,5 @@
 /*
-SPDX-FileCopyrightText: 2024 SAP SE or an SAP affiliate company and project-operator contributors
+SPDX-FileCopyrightText: 2025 SAP SE or an SAP affiliate company and project-operator contributors
 SPDX-License-Identifier: Apache-2.0
 */
 
@@ -8,7 +8,7 @@ SPDX-License-Identifier: Apache-2.0
 package externalversions
 
 import (
-	"fmt"
+	fmt "fmt"
 
 	v1alpha1 "github.com/sap/project-operator/api/v1alpha1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"

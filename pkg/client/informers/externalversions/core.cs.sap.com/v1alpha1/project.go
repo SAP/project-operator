@@ -1,5 +1,5 @@
 /*
-SPDX-FileCopyrightText: 2024 SAP SE or an SAP affiliate company and project-operator contributors
+SPDX-FileCopyrightText: 2025 SAP SE or an SAP affiliate company and project-operator contributors
 SPDX-License-Identifier: Apache-2.0
 */
 
@@ -8,13 +8,13 @@ SPDX-License-Identifier: Apache-2.0
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
-	corecssapcomv1alpha1 "github.com/sap/project-operator/api/v1alpha1"
+	apiscorecssapcomv1alpha1 "github.com/sap/project-operator/api/v1alpha1"
 	versioned "github.com/sap/project-operator/pkg/client/clientset/versioned"
 	internalinterfaces "github.com/sap/project-operator/pkg/client/informers/externalversions/internalinterfaces"
-	v1alpha1 "github.com/sap/project-operator/pkg/client/listers/core.cs.sap.com/v1alpha1"
+	corecssapcomv1alpha1 "github.com/sap/project-operator/pkg/client/listers/core.cs.sap.com/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -25,7 +25,7 @@ import (
 // Projects.
 type ProjectInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.ProjectLister
+	Lister() corecssapcomv1alpha1.ProjectLister
 }
 
 type projectInformer struct {
@@ -60,7 +60,7 @@ func NewFilteredProjectInformer(client versioned.Interface, namespace string, re
 				return client.CoreV1alpha1().Projects(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&corecssapcomv1alpha1.Project{},
+		&apiscorecssapcomv1alpha1.Project{},
 		resyncPeriod,
 		indexers,
 	)
@@ -71,9 +71,9 @@ func (f *projectInformer) defaultInformer(client versioned.Interface, resyncPeri
 }
 
 func (f *projectInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&corecssapcomv1alpha1.Project{}, f.defaultInformer)
+	return f.factory.InformerFor(&apiscorecssapcomv1alpha1.Project{}, f.defaultInformer)
 }
 
-func (f *projectInformer) Lister() v1alpha1.ProjectLister {
-	return v1alpha1.NewProjectLister(f.Informer().GetIndexer())
+func (f *projectInformer) Lister() corecssapcomv1alpha1.ProjectLister {
+	return corecssapcomv1alpha1.NewProjectLister(f.Informer().GetIndexer())
 }

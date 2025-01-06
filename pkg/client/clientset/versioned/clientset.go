@@ -1,5 +1,5 @@
 /*
-SPDX-FileCopyrightText: 2024 SAP SE or an SAP affiliate company and project-operator contributors
+SPDX-FileCopyrightText: 2025 SAP SE or an SAP affiliate company and project-operator contributors
 SPDX-License-Identifier: Apache-2.0
 */
 
@@ -8,8 +8,8 @@ SPDX-License-Identifier: Apache-2.0
 package versioned
 
 import (
-	"fmt"
-	"net/http"
+	fmt "fmt"
+	http "net/http"
 
 	corev1alpha1 "github.com/sap/project-operator/pkg/client/clientset/versioned/typed/core.cs.sap.com/v1alpha1"
 	discovery "k8s.io/client-go/discovery"
@@ -22,8 +22,7 @@ type Interface interface {
 	CoreV1alpha1() corev1alpha1.CoreV1alpha1Interface
 }
 
-// Clientset contains the clients for groups. Each group has exactly one
-// version included in a Clientset.
+// Clientset contains the clients for groups.
 type Clientset struct {
 	*discovery.DiscoveryClient
 	coreV1alpha1 *corev1alpha1.CoreV1alpha1Client
@@ -49,6 +48,10 @@ func (c *Clientset) Discovery() discovery.DiscoveryInterface {
 // where httpClient was generated with rest.HTTPClientFor(c).
 func NewForConfig(c *rest.Config) (*Clientset, error) {
 	configShallowCopy := *c
+
+	if configShallowCopy.UserAgent == "" {
+		configShallowCopy.UserAgent = rest.DefaultKubernetesUserAgent()
+	}
 
 	// share the transport between all clients
 	httpClient, err := rest.HTTPClientFor(&configShallowCopy)
