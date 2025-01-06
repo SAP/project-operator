@@ -318,6 +318,8 @@ github.com/sap/go-generics v0.2.21 h1:WfRIqFSwEzHNww+q4iayCpo139EXIoKCIyv45qfo62
 github.com/sap/go-generics v0.2.21/go.mod h1:RctuDlZAmijeTY6LDaqhLYeepxdiR8AxPxlu7UQHNz0=
 github.com/sap/go-generics v0.2.22 h1:2CIlZaE6eSH3cNI69lqmLeingv+5u9sMHEP9Sfvp0ZA=
 github.com/sap/go-generics v0.2.22/go.mod h1:PRzfl0dQi4UxFajEv/CgX9gXDXP7AnsD5hzqk62TMLQ=
+github.com/sap/go-generics v0.2.23 h1:SPJOJRpJZIebNqAgD05J/ppx6VpnkjMrsDhsPJW2LpU=
+github.com/sap/go-generics v0.2.23/go.mod h1:bXaOsCJQivxw+Yo+MH1e6oOz0vxb+v1Uaat9rCmlug4=
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
 github.com/spf13/pflag v1.0.5/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
 github.com/stoewer/go-strcase v1.2.0/go.mod h1:IBiWB2sKIp3wVVQ3Y035++gc+knqhUQag1KpM8ahLw8=
