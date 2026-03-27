@@ -17,7 +17,6 @@ import (
 	admissionv1 "k8s.io/api/admission/v1"
 	authorizationv1 "k8s.io/api/authorization/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -51,9 +50,7 @@ func NewProjectWebhook(client client.Client, options ProjectReconcilerOptions) *
 	}
 }
 
-func (w *ProjectWebhook) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	// note: it should be safe to cast obj to *Project
-	project := obj.(*corev1alpha1.Project)
+func (w *ProjectWebhook) ValidateCreate(ctx context.Context, project *corev1alpha1.Project) (admission.Warnings, error) {
 	projectlog.Info("validate create", "name", project.Name)
 
 	if err := w.validate(ctx, project); err != nil {
@@ -63,10 +60,7 @@ func (w *ProjectWebhook) ValidateCreate(ctx context.Context, obj runtime.Object)
 	return nil, nil
 }
 
-func (w *ProjectWebhook) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
-	// note: it should be safe to cast oldObj, newObj to *Project
-	oldProject := oldObj.(*corev1alpha1.Project)
-	newProject := newObj.(*corev1alpha1.Project)
+func (w *ProjectWebhook) ValidateUpdate(ctx context.Context, oldProject, newProject *corev1alpha1.Project) (admission.Warnings, error) {
 	projectlog.Info("validate update", "name", newProject.Name)
 
 	if err := w.validate(ctx, newProject); err != nil {
@@ -76,9 +70,7 @@ func (w *ProjectWebhook) ValidateUpdate(ctx context.Context, oldObj, newObj runt
 	return nil, w.authorize(ctx, oldProject)
 }
 
-func (w *ProjectWebhook) ValidateDelete(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	// note: it should be safe to cast obj to *Project
-	project := obj.(*corev1alpha1.Project)
+func (w *ProjectWebhook) ValidateDelete(ctx context.Context, project *corev1alpha1.Project) (admission.Warnings, error) {
 	projectlog.Info("validate delete", "name", project.Name)
 
 	return nil, w.authorize(ctx, project)
@@ -159,8 +151,7 @@ func (w *ProjectWebhook) authorize(ctx context.Context, project *corev1alpha1.Pr
 }
 
 func (w *ProjectWebhook) SetupWebhookWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(&corev1alpha1.Project{}).
+	return ctrl.NewWebhookManagedBy(mgr, &corev1alpha1.Project{}).
 		WithValidator(w).
 		Complete()
 }
