@@ -7,7 +7,7 @@ require (
 	github.com/onsi/gomega v1.42.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.24.1
-	github.com/sap/go-generics v0.2.70
+	github.com/sap/go-generics v0.2.71
 	k8s.io/api v0.36.3
 	k8s.io/apimachinery v0.36.3
 	k8s.io/client-go v0.36.3
