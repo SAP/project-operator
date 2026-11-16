@@ -7,14 +7,14 @@ require (
 	github.com/onsi/gomega v1.44.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.25.0
-	github.com/sap/go-generics v0.2.80
+	github.com/sap/go-generics v0.2.81
 	k8s.io/api v0.37.2
 	k8s.io/apimachinery v0.37.2
 	k8s.io/client-go v0.37.2
 	k8s.io/code-generator v0.37.2
 	sigs.k8s.io/cli-utils v0.37.2
-	sigs.k8s.io/controller-runtime v0.25.2
-	sigs.k8s.io/controller-runtime/tools/setup-envtest v0.25.2
+	sigs.k8s.io/controller-runtime v0.25.3
+	sigs.k8s.io/controller-runtime/tools/setup-envtest v0.25.3
 	sigs.k8s.io/controller-tools v0.22.0
 )
 
